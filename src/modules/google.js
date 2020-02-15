@@ -225,7 +225,7 @@ class GoogleScraper extends Scraper {
 
     async load_start_page() {
         let startUrl = 'https://www.google.com';
-
+    
         if (this.config.google_settings) {
             startUrl = `https://www.${this.config.google_settings.google_domain}/search?q=`;
             if (this.config.google_settings.google_domain) {
@@ -815,7 +815,37 @@ class GoogleShoppingScraper extends Scraper {
     }
 }
 
+class GoogleCustomScraper extends GoogleScraper {
 
+    constructor(...args) {
+        super(...args);
+        this.selectors = this.config.selectors;
+    }
+
+    async parse_async(html) {
+        let selectors = this.selectors;
+        this.logger.info(Object.values(this.config.selectors).join(','))
+        let that = this;
+        const results = await this.page.evaluate((selectors) => {
+            let results = {};
+            //that.logger.info(Object.values(selectors).join(','))
+            for(var key in selectors){
+                el = document.querySelector(selectors[key]);
+                if (el) {
+                    results[key] = el.innerText;
+                } else {
+                    results[key] = '';
+                }
+            }
+            return results;
+        },selectors);
+        return {
+            time: (new Date()).toUTCString(),
+            results: results,
+        }
+    }
+
+}
 
 function clean_image_url(url) {
     // Example:
@@ -848,6 +878,7 @@ module.exports = {
     GoogleImageScraper: GoogleImageScraper,
     GoogleNewsScraper: GoogleNewsScraper,
     GoogleMapsScraper: GoogleMapsScraper,
+    GoogleCustomScraper: GoogleCustomScraper
 };
 
 

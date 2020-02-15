@@ -38,6 +38,7 @@ function getScraper(search_engine, args) {
     if (typeof search_engine === 'string') {
         return new {
             google: google.GoogleScraper,
+            google_custom: google.GoogleCustomScraper,
             google_news_old: google.GoogleNewsOldScraper,
             google_news: google.GoogleNewsScraper,
             google_image: google.GoogleImageScraper,
